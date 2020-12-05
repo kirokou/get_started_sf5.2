@@ -65,7 +65,3 @@ user:
 ## make Authentification
 auth:
 	$(sc) make:auth
-
-## fixture load
-fixture-load:
-	$(sc) doctrine:fixtures:load --append
