@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    {% for flashError in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flashError }}</div>
+    {% endfor %}
+
+    <h1>Hi! Please confirm your email!</h1>
+
+    <p>
+        An Email is sent to your email address.
+        Please confirm your email address by clicking the link in you email address <br><br>
+    </p>
+{% endblock %}
