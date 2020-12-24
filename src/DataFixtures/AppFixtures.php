@@ -22,8 +22,6 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $this->loadIp($manager);
-        $this->loadContact($manager);
         $this->loadUser($manager);
     }
 
