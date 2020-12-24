@@ -125,6 +125,7 @@ class ResetPasswordController extends AbstractController
 
             //add flash
             $this->addFlash('success', 'Votre mot de passe a bien été modifié. Vous devez à présent vous authentifier.');
+
             return $this->redirectToRoute('app_login');
         }
 

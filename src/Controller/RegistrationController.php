@@ -59,18 +59,18 @@ class RegistrationController extends AbstractController
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
-            // do anything else you need here, like send an email
+            // Do anything else you need here, like send an email
 
             //return la page de demande d'activation d'activation
-
             return $this->render('registration/confirm_register_request.html.twig');
+          
             /*
-            return $guardHandler->authenticateUserAndHandleSuccess(
-                $user,
-                $request,
-                $authenticator,
-                'main' // firewall name in security.yaml
-            );
+              return $guardHandler->authenticateUserAndHandleSuccess(
+                  $user,
+                  $request,
+                  $authenticator,
+                  'main' // firewall name in security.yaml
+              );
             */
         }
 
