@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Faker\Factory;
-use Faker\Generator;
+//use Faker\Factory;
+//use Faker\Generator;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
 {
-    private Generator $faker;
+//    private Generator $faker;
     private UserPasswordEncoderInterface $passwordEncoder;
 
     public function __construct(UserPasswordEncoderInterface $passwordEncoder)
     {
-        $this->faker = Factory::create();
+//        $this->faker = Factory::create();
         $this->passwordEncoder = $passwordEncoder;
     }
 
@@ -35,5 +37,4 @@ class AppFixtures extends Fixture
         $manager->persist($user);
         $manager->flush();
     }
-
 }

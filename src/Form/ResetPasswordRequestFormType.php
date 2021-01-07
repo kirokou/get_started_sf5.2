@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -14,7 +16,7 @@ class ResetPasswordRequestFormType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'mapped'=> true,
+                'mapped' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter your email',

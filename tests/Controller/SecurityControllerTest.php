@@ -1,83 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
-use App\Tests\Traits\NeedLogin;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class SecurityControllerTest extends WebTestCase
 {
-    use NeedLogin;
-
-    protected KernelBrowser $client;
-
-    public function setUp(): void
-    {
-        $this->client = static::createClient();
-        parent::setUp();
-    }
-
     public function testLoginPage(): void
     {
-        $crawler = $this->client->request('GET', '/en/login');
-        static::assertSame(200, $this->client->getResponse()->getStatusCode());
-        static::assertResponseIsSuccessful();
+        $crawler = $this->client->request('GET', '/login');
+        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
         // form
-        static::assertSelectorNotExists('.alert.alert-danger');
-        static::assertSame(1, $crawler->filter('form')->count());
-        static::assertSame(1, $crawler->filter('input[name="email"]')->count());
-        static::assertSame(1, $crawler->filter('input[name="password"]')->count());
-        static::assertSame(1, $crawler->filter('button[type="submit"]')->count());
+        self::assertSelectorNotExists('.alert.alert-danger');
+        self::assertSame(1, $crawler->filter('form')->count());
+        self::assertSame(1, $crawler->filter('input[name="email"]')->count());
+        self::assertSame(1, $crawler->filter('input[name="password"]')->count());
+        self::assertSame(1, $crawler->filter('button[type="submit"]')->count());
     }
 
     public function testLoginWithBadCredentials(): void
     {
-        $crawler = $this->client->request('GET', '/en/login');
+        $crawler = $this->client->request('GET', '/login');
         // Form
         $form = $crawler->selectButton('Sign in')->form();
         $form['email'] = 'test';
         $form['password'] = 'InvalidPassword';
         $this->client->submit($form);
         // Form redirect
-        static::assertResponseRedirects('/en/login');
+        self::assertResponseRedirects('/login');
         $this->client->followRedirect();
         // Assertions
-        static::assertSame(200, $this->client->getResponse()->getStatusCode());
-        static::assertSelectorExists('.alert.alert-danger');
-        static::assertSelectorTextSame('div.alert', "Email or password could not be found");
-
-    }
-
-    public function testLoginIsSuccessuful(): void
-    {
-        $crawler = $this->client->request('GET', '/en/login');
-        // Form
-        $form = $crawler->selectButton('Sign in')->form();
-        $form['email'] = 'user@gmail.com';
-        $form['password'] = 'Synolia-2020';
-        $this->client->submit($form);
-        // Form redirect
-        static::assertSame(302, $this->client->getResponse()->getStatusCode());
-        static::assertResponseRedirects('/en/ip');
-        $this->client->followRedirect();
-        static::assertSame(200, $this->client->getResponse()->getStatusCode());
-        // No Message error
-        #static::assertSelectorNotExists('.alert.alert-danger');
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertSelectorExists('.alert.alert-danger');
     }
 
     public function testUserAuthenticatedFully(): void
     {
-        $this->logIn($this->client, $this->getUser('user@gmail.com'));
-        $this->client->request('GET', '/en/login');
-        static::assertResponseRedirects('/en/ip');
+        $this->logInUser();
+        $this->client->request('GET', '/login');
+        self::assertSame(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseRedirects('/');
         $this->client->followRedirect();
-        static::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     public function testLogout(): void
     {
-        $this->client->request('GET', '/en/logout');
-        static::assertSame(302, $this->client->getResponse()->getStatusCode());
+        $this->logInUser();
+        $this->client->request('GET', '/logout');
+        self::assertSame(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseRedirects('');
+        $this->client->followRedirect();
+        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 }
