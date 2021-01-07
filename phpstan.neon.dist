@@ -1,8 +1,0 @@
-parameters:
-	level: 8
-	checkMissingIterableValueType: false
-	excludes_analyse:
-	    - tests/bootstrap.php
-	paths:
-		- src
-		- tests

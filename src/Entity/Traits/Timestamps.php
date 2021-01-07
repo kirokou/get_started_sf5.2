@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity\Traits;
 
 use DateTime;
@@ -8,35 +10,23 @@ use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 
-/**
- * Trait Timestampable
- * @package App\Entity\Traits
- */
-trait Timestampable
+trait Timestamps
 {
     /**
-     * @var DateTimeInterface
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private DateTimeInterface $createdAt;
-    /**
-     * @var DateTimeInterface
-     * @ORM\Column(type="datetime")
-     */
-    private DateTimeInterface $updatedAt;
 
     /**
-     * @return DateTimeInterface
+     * @ORM\Column(type="datetime", nullable=true)
      */
+    private ?DateTimeInterface $updatedAt = null;
+
     public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    /**
-     * @param DateTimeInterface $createdAt
-     * @return $this
-     */
     public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
@@ -44,18 +34,11 @@ trait Timestampable
         return $this;
     }
 
-    /**
-     * @return DateTimeInterface
-     */
-    public function getUpdatedAt(): DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    /**
-     * @param DateTimeInterface $updatedAt
-     * @return $this
-     */
     public function setUpdatedAt(DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
@@ -65,21 +48,24 @@ trait Timestampable
 
     /**
      * @ORM\PrePersist()
-     * @return $this
+     *
      * @throws Exception
+     *
+     * @return $this
      */
     public function setCreatedAtValue(): self
     {
         $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = new DateTime();
 
         return $this;
     }
 
     /**
      * @ORM\PreUpdate()
-     * @return $this
+     *
      * @throws Exception
+     *
+     * @return $this
      */
     public function setUpdatedAtValue(): self
     {

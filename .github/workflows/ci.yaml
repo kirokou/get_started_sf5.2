@@ -1,0 +1,50 @@
+name: CI
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    test:
+        strategy:
+            fail-fast: true
+            matrix:
+                os: [ 'ubuntu-latest', 'windows-latest', 'macos-latest' ]
+                php-version: [ '7.4' , '8.0' ]
+        runs-on: ${{ matrix.os }}
+        name: ${{ matrix.os }} / PHP ${{ matrix.php-version }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    coverage: none
+                    php-version: ${{ matrix.php-versions }}
+                    tools: composer:v2
+
+            -   name: Get composer cache directory
+                id: composercache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composercache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                    restore-keys: ${{ runner.os }}-composer-
+
+            -   name: Install dependencies
+                id: install
+                run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+            -   name: Prepare the database
+                run: |
+                    ./bin/console doctrine:database:drop --env=test --force
+                    ./bin/console doctrine:database:create --env=test
+                    ./bin/console doctrine:schema:update --env=test --force
+
+            -   name: Run tests
+                run: php bin/phpunit
