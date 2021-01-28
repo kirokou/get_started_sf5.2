@@ -1,0 +1,18 @@
+App\Entity\User:
+
+    user_{1..10}:
+        email: user_email_<current()>\@domain.com
+        password: user_password_test
+        is_verified: true
+
+    admin_{1..10}:
+        email: admin_email_<current()>\@domain.com
+        password: admin_password_test
+        roles: ['ROLE_ADMIN']
+        is_verified: true
+
+    super_admin_{1..10}:
+        email: super_admin_email_<current()>\@domain.com
+        password: super_admin_password_test
+        roles: ['ROLE_SUPER_ADMIN']
+        is_verified: true

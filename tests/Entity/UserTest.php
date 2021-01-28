@@ -1,40 +1,72 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Entity;
 
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Tests\KernelTestCase;
+use DateTimeImmutable;
 
 class UserTest extends KernelTestCase
 {
-    private User $user;
-
-    public function setUp(): void
-    {
-        $this->user = new User();
-    }
-
     public function testUsername(): void
     {
-        $this->user->setEmail('test@domain.fr');
-        self::assertEquals('test@domain.fr', $this->user->getEmail());
+        $user = $this->getUser();
+        self::assertSame('user_test_email@example.com', $user->getEmail());
     }
 
     public function testPassword(): void
     {
-        $this->user->setPassword('usertestpassword');
-        self::assertEquals('usertestpassword', $this->user->getPassword());
+        $user = $this->getUser();
+        self::assertSame('user_test_password', $user->getPassword());
+    }
+
+    public function testIsVerified(): void
+    {
+        $user = $this->getUser();
+        self::assertTrue($user->isVerified());
     }
 
     public function testGetSalt(): void
     {
-        self::assertEquals(null, $this->user->getSalt());
+        $user = $this->getUser();
+        self::assertNull($user->getSalt());
     }
 
-    public function testEraseCredentials(): void
+    public function testSaveAdminsSuccessfully(): void
     {
-        $user = $this->user;
-        $this->user->eraseCredentials();
-        self::assertEquals($user, $this->user);
+        $user = $this->saveUser();
+
+        self::assertNotNull($user->getId());
+        self::assertIsInt($user->getId());
+        self::assertInstanceOf(DateTimeImmutable::class, $user->getCreatedAt());
+        self::assertNull($user->getUpdatedAt());
+    }
+
+    public function testAdminsWithEmailAlreadyExists(): void
+    {
+        $this->loadFixtureFiles([\dirname(__DIR__).'/Fixtures/UserFixturesTest.yaml']);
+        $user = $this->getUser();
+
+        $this->assertHasErrors($user->setEmail('user_email_1@domain.com'), 1);
+    }
+
+    private function saveUser(): User
+    {
+        $user = $this->getUser();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+
+    private function getUser(): User
+    {
+        return (new User())
+            ->setEmail('user_test_email@example.com')
+            ->setPassword('user_test_password')
+            ->setIsVerified(true)
+        ;
     }
 }
